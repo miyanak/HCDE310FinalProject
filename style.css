@@ -80,6 +80,7 @@ ul li.active a {
 
 .homeimage {
     opacity: 0.5;
+    display: center; 
 }
 
 /* ----------------------- GETTING USER INPUT ----------------------- */

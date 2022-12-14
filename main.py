@@ -84,8 +84,8 @@ def wine_get(str_food_type, max_price="none"):
         error = ["No results found"]
 
         # Check to see if wines were found
-        if json_result["status"] == "failure":
-            wine_list = json_result["status"]
+        if "status" in json_result:
+            wine_list = json_result["status"] # "failure"
             return wine_list
 
         paired_wines = json_result["pairedWines"]
@@ -140,14 +140,15 @@ def wine_handler():
 def wine_response_handler():
     food_type = request.args.get("food_type") # Will be a string ("steak", "italian", etc)
     app.logger.info(food_type)
-    str_food_type = food_type.replace(" ", "_")
+    # str_food_type = food_type.replace(" ", "_")
+    food_type = food_type.replace(" ", "_")
     # print(str_food_type) # THIS IS A CHECK
 
     max_price = request.args.get("max_price")
     app.logger.info(max_price)
 
     if len(food_type) != 0: # if user inputted a food to wine pair with
-        wine_list=wine_get(str_food_type, max_price)
+        wine_list=wine_get(food_type, max_price)
 
         # If no wines found, throw error
         if wine_list == "failure" or len(wine_list) <= 0:
