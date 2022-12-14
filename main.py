@@ -34,7 +34,7 @@ def get_recipe_info(recipe_id):
         inner_list = [image, title, recipe_link] # store title of recipe and the link to the original recipe in a list
         return inner_list # return this list to recipes_get() to add to list of all recipes
 
-# Base attempt at getting a json dict of data from Spoonacular
+# Get a json dict of data from Spoonacular
 #   number = 3 <-- # of recipes returned
 #   sort = popularity <-- sorts recipes in terms of most to least popular
 def recipes_get(ingredients, diet="none"): 
@@ -52,7 +52,6 @@ def recipes_get(ingredients, diet="none"):
     if result is not None:
         json_result = json.load(result)
         # print(len(json_result)) # THIS IS A CHECK
-        # return json_result
         # Get recipe id's for each recipe returned
         recipes_list = []
         error = ["No results found"]
@@ -60,13 +59,13 @@ def recipes_get(ingredients, diet="none"):
             recipe_id = json_result['results'][i]['id'] # Get recipe id to put into get_recipe_info()
             one_list = get_recipe_info(recipe_id) # Catch returned list for a single recipe
             recipes_list.append(one_list) # Add single list to larger list of all the recipes
-        # print(recipe_list)
+        # print(recipe_list) # THIS IS A CHECK
         if recipes_list != []:
             return recipes_list # Return this info to the webpage
         else:
             return error
 
-# Base attempt at getting wine pairings from Spoonacular API
+# Get wine pairings from Spoonacular API
 # Parameters: 
 def wine_get(str_food_type, max_price="none"):
     if max_price == "none": #user didn't set a max price limit for wine
@@ -84,7 +83,13 @@ def wine_get(str_food_type, max_price="none"):
         wine_list = []
         error = ["No results found"]
 
+        # Check to see if wines were found
+        if json_result["status"] == "failure":
+            wine_list = json_result["status"]
+            return wine_list
+
         paired_wines = json_result["pairedWines"]
+
         str_paired_wines = ", ".join(paired_wines)
         wine_list += [str_paired_wines]
         # print(str_paired_wines) # THIS IS A CHECK
@@ -108,9 +113,6 @@ def wine_get(str_food_type, max_price="none"):
 
         wine_price = json_result["productMatches"][0]["price"]
         wine_list += [wine_price]
-
-        if wine_list == []:
-            return error
         return wine_list
     else: 
         return error
@@ -147,22 +149,23 @@ def wine_response_handler():
     if len(food_type) != 0: # if user inputted a food to wine pair with
         wine_list=wine_get(str_food_type, max_price)
 
-        if wine_list == ["No results found"] or len(wine_list) <= 0:
-            return render_template("norecipes.html")
-
-        paired_wines = wine_list[0] # paired wines
-        pairing_descrip = wine_list[1] # explanation of pairings
-        # wine product
-        wine_name = wine_list[2]
-        wine_descrip = wine_list[3]
-        wine_image = wine_list[4]
-        wine_link = wine_list[5]
-        wine_price = wine_list[6]
-        
-        return render_template("winerecs.html", page_title="Selected Wines",
-        paired_wines=paired_wines, pairing_descrip=pairing_descrip,
-        wine_name=wine_name, wine_descrip=wine_descrip, wine_image=wine_image,
-        wine_link=wine_link, wine_price=wine_price)
+        # If no wines found, throw error
+        if wine_list == "failure" or len(wine_list) <= 0:
+            return render_template("nodata.html")
+        else: 
+            paired_wines = wine_list[0] # paired wines
+            pairing_descrip = wine_list[1] # explanation of pairings
+            # wine product
+            wine_name = wine_list[2]
+            wine_descrip = wine_list[3]
+            wine_image = wine_list[4]
+            wine_link = wine_list[5]
+            wine_price = wine_list[6]
+            
+            return render_template("winerecs.html", page_title="Selected Wines",
+            paired_wines=paired_wines, pairing_descrip=pairing_descrip,
+            wine_name=wine_name, wine_descrip=wine_descrip, wine_image=wine_image,
+            wine_link=wine_link, wine_price=wine_price)
 
 # RECIPE FINDER PAGE (returning spoonacular data)
 @app.route("/getrecipes")
@@ -176,13 +179,13 @@ def ingredient_response_handler():
     diet = request.args.get("diet")
     app.logger.info(diet)
 
-    # if (len(ingredients) > 0) and (diet != "none"): # if the user filled in the form, return a list of recipes
+    # if the user filled in the form, return a list of recipes
     if (len(ingredients) > 0): 
-        spoon_data=recipes_get(str_ingredients, diet)
+        spoon_data=recipes_get(str_ingredients, diet) # run recipes_get() method to get the name of the recipes returned
         
-        # FIGURE THIS THINGY OUT PLEASE!!!!!
+        # Not enough recipes to get the necessary info
         if len(spoon_data) < 3:
-            return render_template("norecipes.html")
+            return render_template("nodata.html")
 
         recip_one_image = spoon_data[0][0] 
         recip_one_name = spoon_data[0][1]
@@ -210,13 +213,13 @@ def ingredient_response_handler():
                 recip_three_name=recip_three_name,
                 recip_three_image=recip_three_image,
                 recip_three_link=recip_three_link
-            ) # run recipes_get() method to get the name of the recipes returne
+            )
     elif len(ingredients) <= 0:
-        return render_template("norecipes.html",
+        return render_template("nodata.html",
             page_title="Error",
             prompt="No ingredients submitted")
-    else: # if form isn't filled, show form again with prompt to user
-        return render_template("norecipes.html",
+    else: # if form isn't filled, return error page
+        return render_template("nodata.html",
             page_title="Error",
             prompt="No ingredients submitted")
 
