@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="stylesheet" href="/static/style.css">
+        <title>{{page_title}}</title>
+    </head>
+    <body>
+        <main>
+            <div class="nav-bar">
+                <ul>
+                    <li><a href="/">Home</a></li>
+                    <li class="active"><a href="/recipes">Search Recipes</a></li>
+                    <li><a href="/wines">Wine Pairings</a></li>
+                </ul>
+            </div>
+
+            <div>
+                <div class="title">
+                    <h1>DISCOVER RECIPES</h1>
+                </div>
+            </div>
+        
+            <section class="container">
+                <!-- RECIPE 1 -->
+                <div class="card">
+                    <img src={{recip_one_image}} alt="Recipe 1 Image">
+                    <h2>{{recip_one_name}}</h2>
+                    <a href={{recip_one_link}} target="_blank">
+                        <button>VIEW RECIPE</button>
+                    </a>
+                </div>
+        
+                <!-- RECIPE 2 -->
+                <div class="card">
+                    <img src={{recip_two_image}} alt="Recipe 2 Image">
+                    <h2>{{recip_two_name}}</h2>
+                    <a href={{recip_two_link}} target="_blank">
+                        <button>VIEW RECIPE</button>
+                    </a>
+                </div>
+        
+                <!-- RECIPE 3 -->
+                <div class="card">
+                    <img src={{recip_three_image}} alt="Recipe 3 Image">
+                    <h2>{{recip_three_name}}</h2>
+                    <a href={{recip_three_link}} target="_blank">
+                        <button>VIEW RECIPE</button>
+                    </a>
+                </div>
+
+                <!-- "Search Again" Card -->
+                <div class="card">
+                    <h2>Hungry for more?</h2>
+                    <p><a href="/recipes">
+                        <button>NEW SEARCH</button>
+                    </a></p>
+                </div>
+            </section>
+        </main>
+    </body>
+</html>
